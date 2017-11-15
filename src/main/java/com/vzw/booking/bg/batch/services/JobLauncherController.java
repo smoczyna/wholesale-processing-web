@@ -44,7 +44,7 @@ public class JobLauncherController {
     @Autowired
     Job job;
     
-    @RequestMapping(value="/info", method = RequestMethod.GET)
+    @RequestMapping(value="/", method = RequestMethod.GET)
     public ResponseEntity info() {
         return ResponseEntity.ok("Wholesale Booking Processing App - status: up and running");
     }
@@ -72,7 +72,7 @@ public class JobLauncherController {
             parameters.put("currentTime", new JobParameter(new Date()));
             parameters.put("threadNo", new JobParameter(threadNo));
             parameters.put("queueNo", new JobParameter(queueNo));
-            parameters.put("chunkSize", new JobParameter(chunkSize));
+            parameters.put("chunkSize", new JobParameter(chunkSize));            
             JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
             BatchJobExecution bjex = SpringJobExectionMapper.convert(jex);
             return ResponseEntity.ok(bjex);

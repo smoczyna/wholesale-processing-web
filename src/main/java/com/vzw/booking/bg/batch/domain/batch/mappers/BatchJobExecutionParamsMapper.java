@@ -5,7 +5,7 @@
  */
 package com.vzw.booking.bg.batch.domain.batch.mappers;
 
-import com.vzw.booking.bg.batch.domain.batch.BatchJobExecutionParams;
+import com.vzw.booking.bg.batch.domain.batch.BatchJobExecutionParam;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,11 +14,11 @@ import org.springframework.jdbc.core.RowMapper;
  *
  * @author smorcja
  */
-public class BatchJobExecutionParamsMapper implements RowMapper<BatchJobExecutionParams> {
+public class BatchJobExecutionParamsMapper implements RowMapper<BatchJobExecutionParam> {
     
     @Override
-    public BatchJobExecutionParams mapRow(ResultSet rs, int rowNum) throws SQLException {
-        BatchJobExecutionParams result = new BatchJobExecutionParams();
+    public BatchJobExecutionParam mapRow(ResultSet rs, int rowNum) throws SQLException {
+        BatchJobExecutionParam result = new BatchJobExecutionParam();
         result.setJobExecutionId(rs.getLong("jobExecutionId"));
         result.setTypeCd(rs.getString("typeCd"));
         result.setKeyName(rs.getString("keyName"));

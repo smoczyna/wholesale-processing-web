@@ -7,10 +7,14 @@ package com.vzw.booking.bg.batch.domain.batch;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -52,6 +56,10 @@ public class BatchJobExecution implements Serializable {
     @Column(name="JOB_CONFIGURATION_LOCATION")
     private String jobConfigurationLocation;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "jobExecutionId", fetch = FetchType.EAGER)
+    private Collection<BatchJobExecutionParam> batchJobExecutionParams;
+ 
+    
     public BatchJobExecution() {
     }
 
@@ -141,5 +149,13 @@ public class BatchJobExecution implements Serializable {
 
     public void setJobConfigurationLocation(String jobConfigurationLocation) {
         this.jobConfigurationLocation = jobConfigurationLocation;
+    }
+
+    public Collection<BatchJobExecutionParam> getBatchJobExecutionParams() {
+        return batchJobExecutionParams;
+    }
+
+    public void setBatchJobExecutionParams(Collection<BatchJobExecutionParam> batchJobExecutionParams) {
+        this.batchJobExecutionParams = batchJobExecutionParams;
     }
 }

@@ -6,8 +6,13 @@
 package com.vzw.booking.bg.batch.domain.batch.mappers;
 
 import com.vzw.booking.bg.batch.domain.batch.BatchJobExecution;
+import com.vzw.booking.bg.batch.domain.batch.BatchJobExecutionParam;
 import java.math.BigInteger;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
 
 /**
  *
@@ -28,6 +33,38 @@ public class SpringJobExectionMapper {
         result.setLastUpdated(jex.getLastUpdated());
         result.setVersion(BigInteger.valueOf(jex.getVersion()));
         result.setJobConfigurationLocation(jex.getJobConfigurationName());
+        Set<BatchJobExecutionParam> params = null;
+        if (jex.getJobParameters()!=null) {
+            params = new HashSet();
+            for (JobParameter param : jex.getJobParameters().getParameters().values()) {
+                params.add(convert(jex.getId(), param));
+            }
+        }
+        result.setBatchJobExecutionParams(params);
         return result;
+    }
+    
+    public static BatchJobExecutionParam convert(Long jobExecutionId, JobParameter jobPar) {
+        BatchJobExecutionParam param = new BatchJobExecutionParam();
+        param.setJobExecutionId(jobExecutionId);
+        param.setTypeCd(jobPar.getType().name());        
+        switch (param.getTypeCd()) {
+            case "DATE":
+                param.setDateVal((Date) jobPar.getValue());
+                break;
+            case "STRING":
+                param.setStringVal((String) jobPar.getValue());
+                break;
+            case "LONG":
+                param.setLongVal((Long) jobPar.getValue());
+                break;
+            case "DOUBLE":
+                param.setDoubleVal((Double) jobPar.getValue());
+                break;
+            default:
+                param.setIdentifying("Unrecognized data type");
+                break;
+        }        
+        return param;
     }
 }

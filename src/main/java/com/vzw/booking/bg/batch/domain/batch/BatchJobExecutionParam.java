@@ -5,6 +5,7 @@
  */
 package com.vzw.booking.bg.batch.domain.batch;
 
+import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,18 +15,25 @@ import javax.persistence.Id;
  * @author smorcja
  */
 @Entity
-public class BatchJobExecutionParams {
+public class BatchJobExecutionParam implements Serializable {
     
     @Id
     private Long jobExecutionId;
+    @Id
     private String typeCd;
+    @Id
     private String keyName;
     private String stringVal;
     private Date dateVal;
     private Long longVal;
     private Double doubleVal;
     private String identifying;
+    
+    //@JoinColumn(name = "JOB_EXECUTION_ID", referencedColumnName = "JOB_EXECUTION_ID")
+    //@ManyToOne(optional = false, fetch = FetchType.LAZY)
+    //private BatchJobExecution jobExecution;
 
+    
     public Long getJobExecutionId() {
         return jobExecutionId;
     }
