@@ -54,7 +54,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author smorcja
  */
 @Configuration
-public class BookigFilesJobConfig {
+public class BookingFilesJobConfig {
 	
     /* listeners and helpers */
 

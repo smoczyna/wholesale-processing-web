@@ -5,6 +5,8 @@
  */
 package com.vzw.booking.bg.batch.services;
 
+import com.vzw.booking.bg.batch.domain.batch.BatchJobExecution;
+import com.vzw.booking.bg.batch.domain.batch.mappers.SpringJobExectionMapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +16,16 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -42,16 +49,37 @@ public class JobLauncherController {
         return ResponseEntity.ok("Wholesale Booking Processing App - status: up and running");
     }
     
-    @RequestMapping(value="/launchJob", method = RequestMethod.GET)
-    public ResponseEntity launchJob() {
+    @RequestMapping(value="/launchDefaultJob", method = RequestMethod.GET)
+    public ResponseEntity launchDefaultJob() {
         try {
             Map<String, JobParameter> parameters = new HashMap<>();  
             parameters.put("currentTime", new JobParameter(new Date()));
             JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
-            return ResponseEntity.accepted().body(jex);
-        } catch (Exception ex) {
+            BatchJobExecution bjex = SpringJobExectionMapper.convert(jex);
+            return ResponseEntity.ok(bjex);
+        } catch (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobRestartException ex) {
             LOGGER.error(ex.getMessage());
             return ResponseEntity.badRequest().body(ex);
         }
     }
+    
+    @RequestMapping(value="/launchJob", method = RequestMethod.GET)
+    public ResponseEntity launchJob(@RequestParam Long threadNo,
+                                    @RequestParam Long queueNo,
+                                    @RequestParam Long chunkSize) {
+        try {
+            Map<String, JobParameter> parameters = new HashMap<>();  
+            parameters.put("currentTime", new JobParameter(new Date()));
+            parameters.put("threadNo", new JobParameter(threadNo));
+            parameters.put("queueNo", new JobParameter(queueNo));
+            parameters.put("chunkSize", new JobParameter(chunkSize));
+            JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
+            BatchJobExecution bjex = SpringJobExectionMapper.convert(jex);
+            return ResponseEntity.ok(bjex);
+        } catch (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobRestartException ex) {
+            LOGGER.error(ex.getMessage());
+            return ResponseEntity.badRequest().body(ex);
+        }
+    }
+    
 }
