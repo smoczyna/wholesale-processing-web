@@ -50,8 +50,8 @@ public class SpringBatchMaintenanceController {
     public ResponseEntity getRestInfo() {
         //List response = new ArrayList();
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUri();
-        
-        return ResponseEntity.created(location).build();        
+        System.out.println("location: "+location);
+        return ResponseEntity.created(location).build();
     }
     
     @RequestMapping(value="/jobInstances", method = RequestMethod.GET)
@@ -68,6 +68,7 @@ public class SpringBatchMaintenanceController {
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
         Object[] callParams = null;
         String sql = "SELECT * FROM BATCH_JOB_EXECUTION ";
+        
         if (fromJobId==null && toJobId!=null) {
             sql = sql.concat("WHERE JOB_INSTANCE_ID < ?");
             callParams = new Object[]{toJobId};
