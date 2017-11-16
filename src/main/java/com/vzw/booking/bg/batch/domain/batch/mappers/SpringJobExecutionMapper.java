@@ -18,7 +18,7 @@ import org.springframework.batch.core.JobParameter;
  *
  * @author smorcja
  */
-public class SpringJobExectionMapper {
+public class SpringJobExecutionMapper {
     
     public static BatchJobExecution convert(JobExecution jex) {
         BatchJobExecution result = new BatchJobExecution();

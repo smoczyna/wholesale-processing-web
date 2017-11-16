@@ -10,12 +10,12 @@ import com.vzw.booking.bg.batch.domain.batch.BatchJobInstance;
 import com.vzw.booking.bg.batch.domain.batch.mappers.BatchJobExecutionMapper;
 import com.vzw.booking.bg.batch.domain.batch.mappers.BatchJobInstanceMapper;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +29,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  */
 @RestController
 @RequestMapping("/SpringBatchMaintenance")
+@CrossOrigin
 public class SpringBatchMaintenanceController {
     //private static final Logger LOGGER = LoggerFactory.getLogger(SpringBatchMaintenanceController.class);
     
@@ -36,6 +37,11 @@ public class SpringBatchMaintenanceController {
     private DataSource metaDataSource;
 
     private ResponseEntity prepareResponse(List payload) {
+        
+//        .header("Access-Control-Allow-Origin", "*")
+//			.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+//			.allow("OPTIONS").build();
+        
         if (payload==null || payload.isEmpty())
             return ResponseEntity.noContent().build();
         else

@@ -6,7 +6,7 @@
 package com.vzw.booking.bg.batch.services;
 
 import com.vzw.booking.bg.batch.domain.batch.BatchJobExecution;
-import com.vzw.booking.bg.batch.domain.batch.mappers.SpringJobExectionMapper;
+import com.vzw.booking.bg.batch.domain.batch.mappers.SpringJobExecutionMapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,7 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/WholesaleBooking")
+@CrossOrigin
 public class JobLauncherController {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JobLauncherController.class);
@@ -55,7 +57,7 @@ public class JobLauncherController {
             Map<String, JobParameter> parameters = new HashMap<>();  
             parameters.put("currentTime", new JobParameter(new Date()));
             JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
-            BatchJobExecution bjex = SpringJobExectionMapper.convert(jex);
+            BatchJobExecution bjex = SpringJobExecutionMapper.convert(jex);
             return ResponseEntity.ok(bjex);
         } catch (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobRestartException ex) {
             LOGGER.error(ex.getMessage());
@@ -74,7 +76,7 @@ public class JobLauncherController {
             parameters.put("queueNo", new JobParameter(queueNo));
             parameters.put("chunkSize", new JobParameter(chunkSize));            
             JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
-            BatchJobExecution bjex = SpringJobExectionMapper.convert(jex);
+            BatchJobExecution bjex = SpringJobExecutionMapper.convert(jex);
             return ResponseEntity.ok(bjex);
         } catch (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobRestartException ex) {
             LOGGER.error(ex.getMessage());

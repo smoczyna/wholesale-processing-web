@@ -43,4 +43,14 @@ public class BookingWholesaleApplicationInit {
     public WholesaleBookingProcessorHelper wholesaleBookingProcessorHelper() {
         return new WholesaleBookingProcessorHelper();
     }
+    
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurerAdapter() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**");
+//            }
+//        };
+//    }
 }
