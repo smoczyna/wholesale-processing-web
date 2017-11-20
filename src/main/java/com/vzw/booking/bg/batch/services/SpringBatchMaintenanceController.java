@@ -61,23 +61,23 @@ public class SpringBatchMaintenanceController {
     }
     
     @RequestMapping(value="/findJobInstances", method = RequestMethod.GET)
-    public ResponseEntity<List<BatchJobInstance>> findJobInstances(@RequestParam(required=false) Long fromInstanceId, 
-                                                                   @RequestParam(required=false) Long toInstanceId) {
+    public ResponseEntity<List<BatchJobInstance>> findJobInstances(@RequestParam(required=false) Long fromJobId, 
+                                                                   @RequestParam(required=false) Long toJobId) {
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
         Object[] callParams = null;
         String sql = "SELECT * FROM BATCH_JOB_INSTANCE";
         
-        if (fromInstanceId==null && toInstanceId!=null) {
+        if (fromJobId==null && toJobId!=null) {
             sql = sql.concat("WHERE JOB_INSTANCE_ID < ?");
-            callParams = new Object[]{toInstanceId};
+            callParams = new Object[]{toJobId};
         }
-        else if (fromInstanceId!=null && toInstanceId==null) {
+        else if (fromJobId!=null && toJobId==null) {
             sql = sql.concat("WHERE JOB_INSTANCE_ID > ?");
-            callParams = new Object[]{fromInstanceId};
+            callParams = new Object[]{fromJobId};
         }
-        else if (fromInstanceId!=null && toInstanceId!=null) {
+        else if (fromJobId!=null && toJobId!=null) {
             sql = sql.concat("WHERE JOB_INSTANCE_ID BETWEEN ? AND ?");
-            callParams = new Object[]{fromInstanceId, toInstanceId};
+            callParams = new Object[]{fromJobId, toJobId};
         }
         
         List<BatchJobInstance> result = jdbc.query(sql, callParams, new BatchJobInstanceMapper());        
@@ -85,10 +85,10 @@ public class SpringBatchMaintenanceController {
     }
     
     @RequestMapping(value="/jobInstances/{instanceId}", method = RequestMethod.GET)
-    public ResponseEntity<List<BatchJobInstance>> getJobInstances(@PathVariable Long instanceId) {
+    public ResponseEntity<List<BatchJobInstance>> getJobInstances(@PathVariable Long jobId) {
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
         String sql = "SELECT * FROM BATCH_JOB_INSTANCE WHERE JOB_INSTANCE_ID = ?";
-        List<BatchJobInstance> result = jdbc.query(sql, new Object[]{instanceId}, new BatchJobInstanceMapper());        
+        List<BatchJobInstance> result = jdbc.query(sql, new Object[]{jobId}, new BatchJobInstanceMapper());        
         return this.prepareResponse(result);
     }
 
