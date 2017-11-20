@@ -65,7 +65,7 @@ public class SpringBatchMaintenanceController {
                                                                    @RequestParam(required=false) Long toJobId) {
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
         Object[] callParams = null;
-        String sql = "SELECT * FROM BATCH_JOB_INSTANCE";
+        String sql = "SELECT * FROM BATCH_JOB_INSTANCE ";
         
         if (fromJobId==null && toJobId!=null) {
             sql = sql.concat("WHERE JOB_INSTANCE_ID < ?");
