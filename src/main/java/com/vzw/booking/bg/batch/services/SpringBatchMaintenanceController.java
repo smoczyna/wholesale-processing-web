@@ -60,17 +60,41 @@ public class SpringBatchMaintenanceController {
         return ResponseEntity.created(location).build();
     }
     
-    @RequestMapping(value="/jobInstances", method = RequestMethod.GET)
-    public ResponseEntity<List<BatchJobInstance>> getJobInstances() {
+    @RequestMapping(value="/findJobInstances", method = RequestMethod.GET)
+    public ResponseEntity<List<BatchJobInstance>> findJobInstances(@RequestParam(required=false) Long fromInstanceId, 
+                                                                   @RequestParam(required=false) Long toInstanceId) {
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
+        Object[] callParams = null;
         String sql = "SELECT * FROM BATCH_JOB_INSTANCE";
-        List<BatchJobInstance> result = jdbc.query(sql, new BatchJobInstanceMapper());        
+        
+        if (fromInstanceId==null && toInstanceId!=null) {
+            sql = sql.concat("WHERE JOB_INSTANCE_ID < ?");
+            callParams = new Object[]{toInstanceId};
+        }
+        else if (fromInstanceId!=null && toInstanceId==null) {
+            sql = sql.concat("WHERE JOB_INSTANCE_ID > ?");
+            callParams = new Object[]{fromInstanceId};
+        }
+        else if (fromInstanceId!=null && toInstanceId!=null) {
+            sql = sql.concat("WHERE JOB_INSTANCE_ID BETWEEN ? AND ?");
+            callParams = new Object[]{fromInstanceId, toInstanceId};
+        }
+        
+        List<BatchJobInstance> result = jdbc.query(sql, callParams, new BatchJobInstanceMapper());        
+        return this.prepareResponse(result);
+    }
+    
+    @RequestMapping(value="/jobInstances/{instanceId}", method = RequestMethod.GET)
+    public ResponseEntity<List<BatchJobInstance>> getJobInstances(@PathVariable Long instanceId) {
+        JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
+        String sql = "SELECT * FROM BATCH_JOB_INSTANCE WHERE JOB_INSTANCE_ID = ?";
+        List<BatchJobInstance> result = jdbc.query(sql, new Object[]{instanceId}, new BatchJobInstanceMapper());        
         return this.prepareResponse(result);
     }
 
     @RequestMapping(value="/findJobExecutions", method = RequestMethod.GET)
     public ResponseEntity<List<BatchJobExecution>> findJobExecution(@RequestParam(required=false) Long fromJobId, 
-                                                                    @RequestParam(required=false) Long toJobId) {        
+                                                                    @RequestParam(required=false) Long toJobId) {
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
         Object[] callParams = null;
         String sql = "SELECT * FROM BATCH_JOB_EXECUTION ";
@@ -95,7 +119,7 @@ public class SpringBatchMaintenanceController {
     @RequestMapping(value="/jobExecutions/{jobId}", method = RequestMethod.GET)
     public ResponseEntity<List<BatchJobExecution>> getJobExecution(@PathVariable Long jobId) {        
         JdbcTemplate jdbc = new JdbcTemplate(metaDataSource);
-        String sql = "SELECT * FROM BATCH_JOB_EXECUTION WHERE JOB_INSTANCE_ID = ?";        
+        String sql = "SELECT * FROM BATCH_JOB_EXECUTION WHERE JOB_INSTANCE_ID = ?";
         List<BatchJobExecution> result = jdbc.query(sql, new Object[]{jobId}, new BatchJobExecutionMapper());
         return this.prepareResponse(result);
     }
