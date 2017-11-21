@@ -30,7 +30,6 @@ import com.vzw.booking.bg.batch.readers.UnbilledBookingFileReader;
 import com.vzw.booking.bg.batch.validation.CsvFileVerificationSkipper;
 import com.vzw.booking.bg.batch.writers.WholesaleOutputWriter;
 import java.io.IOException;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
@@ -95,13 +94,13 @@ public class BookingFilesJobConfig {
     RangePartitioner adminFeesFilePartitioner(Environment environment) throws IOException {
         return new RangePartitioner(environment, "adminfees_split/");
     }
-    
+
     @Value("${spring.batch.number.of.threads}")
     private Integer threadsNo;
     
     @Value("${spring.batch.number.of.queues}")
     private Integer queueNo;
-        
+    
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();

@@ -32,6 +32,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vzw.booking.bg.batch.utils.ProcessingUtils;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -145,6 +147,8 @@ public class WholesaleBookingProcessor<T> implements ItemProcessor<T, WholesaleP
         subLedgerOutput.setFinancialmarketId(financialMarket);
         subLedgerOutput.setBillCycleMonthYear(ProcessingUtils.getYearAndMonthFromStrDate(this.processingHelper.getDates().getRptPerEndDate()));
         subLedgerOutput.setBillAccrualIndicator(financialEventCategory.getBillingaccrualindicator());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh.mm.ss.ssssss");
+        subLedgerOutput.setUpdateTimestamp(sdf.format(new Date()));
         return subLedgerOutput;
     }
 
