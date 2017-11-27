@@ -19,6 +19,8 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -30,6 +32,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -46,13 +49,16 @@ public class JobLauncherController {
 
     @Autowired
     JobLauncher jobLauncher;
+    
+    @Autowired
+    JobOperator jobOperator;
 
     @Autowired
     Job job;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ResponseEntity info() {
-        return ResponseEntity.ok("Wholesale Booking Processing App - status: up and running");
+        return ResponseEntity.ok("{\"info\" : \"Wholesale Booking Processing App is up and running\"}");
     }
 
     @RequestMapping(value="/launchJob", method = RequestMethod.GET)
@@ -63,10 +69,25 @@ public class JobLauncherController {
             parameters.put("currentTime", new JobParameter(new Date()));
             JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
             BatchJobExecution bjex = SpringJobExecutionMapper.convert(jex);
-            return new AsyncResult<ResponseEntity>(ResponseEntity.ok(bjex));
+            return new AsyncResult(ResponseEntity.ok(bjex));
         } catch (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobRestartException ex) {
             LOGGER.error(ex.getMessage());
-            return new AsyncResult<ResponseEntity>(ResponseEntity.badRequest().body(ex));
+            return new AsyncResult(ResponseEntity.badRequest().body(ex));
+        }
+    }
+    
+    @RequestMapping(value="/stopJob", method = RequestMethod.GET)
+    public ResponseEntity stopJob(@RequestParam(required=true) Long instanceId) {
+        try {
+            boolean result = jobOperator.stop(instanceId);
+            if (result) 
+                return ResponseEntity.ok("{\"success\" : \"Job forcefully stopped\"}");
+            else 
+                return ResponseEntity.ok("{\"failure\" : \"Failed to stop the job, let it finish or try again later\"}");            
+            
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            return ResponseEntity.badRequest().body(ex);
         }
     }
     
@@ -116,5 +137,5 @@ public class JobLauncherController {
 //        });
 //        return deferredResult;
 //    }
-    
+
 }

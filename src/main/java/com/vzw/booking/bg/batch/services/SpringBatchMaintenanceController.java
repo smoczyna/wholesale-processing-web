@@ -68,11 +68,11 @@ public class SpringBatchMaintenanceController {
         String sql = "SELECT * FROM BATCH_JOB_INSTANCE ";
         
         if (fromJobId==null && toJobId!=null) {
-            sql = sql.concat("WHERE JOB_INSTANCE_ID < ?");
+            sql = sql.concat("WHERE JOB_INSTANCE_ID <= ?");
             callParams = new Object[]{toJobId};
         }
         else if (fromJobId!=null && toJobId==null) {
-            sql = sql.concat("WHERE JOB_INSTANCE_ID > ?");
+            sql = sql.concat("WHERE JOB_INSTANCE_ID >= ?");
             callParams = new Object[]{fromJobId};
         }
         else if (fromJobId!=null && toJobId!=null) {
@@ -100,11 +100,11 @@ public class SpringBatchMaintenanceController {
         String sql = "SELECT * FROM BATCH_JOB_EXECUTION ";
         
         if (fromJobId==null && toJobId!=null) {
-            sql = sql.concat("WHERE JOB_INSTANCE_ID < ?");
+            sql = sql.concat("WHERE JOB_INSTANCE_ID <= ?");
             callParams = new Object[]{toJobId};
         }          
         else if (fromJobId!=null && toJobId==null) {
-            sql = sql.concat("WHERE JOB_INSTANCE_ID > ?");
+            sql = sql.concat("WHERE JOB_INSTANCE_ID >= ?");
             callParams = new Object[]{fromJobId};
         }
         else if (fromJobId!=null && toJobId!=null) {
@@ -123,8 +123,5 @@ public class SpringBatchMaintenanceController {
         List<BatchJobExecution> result = jdbc.query(sql, new Object[]{jobId}, new BatchJobExecutionMapper());
         return this.prepareResponse(result);
     }
-    
-//    public ReponseEntity stopRunningJob(@RequstParam Long jobId) {
-//        
-//    }
+
 }
