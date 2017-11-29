@@ -20,7 +20,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -40,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author smorcja
  */
 @RestController
-@RequestMapping("/WholesaleBooking")
+@RequestMapping("/WholesaleBookingJob")
 @CrossOrigin
 @EnableAsync
 public class JobLauncherController {
@@ -84,6 +83,20 @@ public class JobLauncherController {
                 return ResponseEntity.ok("{\"success\" : \"Job forcefully stopped\"}");
             else 
                 return ResponseEntity.ok("{\"failure\" : \"Failed to stop the job, let it finish or try again later\"}");            
+            
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            return ResponseEntity.badRequest().body(ex);
+        }
+    }
+    
+    @RequestMapping(value="/restartJob", method = RequestMethod.GET)
+    public ResponseEntity restartJob(@RequestParam(required=true) Long instanceId) {
+        try {
+            long result = jobOperator.restart(instanceId);
+            return ResponseEntity.ok("{\"success\" : \"Job successfully restarted with new id: " + result + "\"}");
+            
+                //return ResponseEntity.ok("{\"failure\" : \"Failed to restart the job, it might not be restartable or cruched really badly\"}");            
             
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());

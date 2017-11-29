@@ -53,4 +53,23 @@ public class BookingsJobCommandLineLauncher {
         parameters.put("currentTime", new JobParameter(new Date()));
         return new JobParameters(parameters);
     }
+    
+//    @Bean
+//    public JobRepository jobRepository(final DataSource dataSource, final PlatformTransactionManager transactionManager) {
+//
+//        final JobRepositoryFactoryBean bean = new JobRepositoryFactoryBean();
+//        bean.setDatabaseType(databaseType);
+//        bean.setDataSource(dataSource);
+//        if (StringUtils.isNotBlank(schemaName)) {
+//            bean.setTablePrefix(schemaName);
+//        }
+//        bean.setTransactionManager(transactionManager);
+//        try {
+//            bean.afterPropertiesSet();
+//            return bean.getObject();
+//        } catch (final Exception e) {
+//            throw new BatchConfigurationException("Invalid batch job repository configuration.", e);
+//        }
+//    }
+
 }
