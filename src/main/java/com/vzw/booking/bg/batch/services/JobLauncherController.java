@@ -17,12 +17,10 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -51,6 +49,9 @@ public class JobLauncherController {
     
     @Autowired
     JobOperator jobOperator;
+    
+    @Autowired
+    JobRegistry jobRegistry;
 
     @Autowired
     Job job;
@@ -66,19 +67,22 @@ public class JobLauncherController {
         try {
             Map<String, JobParameter> parameters = new HashMap<>();  
             parameters.put("currentTime", new JobParameter(new Date()));
-            JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));
+            
+            ReferenceJobFactory jobFactory = new ReferenceJobFactory(job);
+            jobRegistry.register(jobFactory);
+            JobExecution jex = jobLauncher.run(job, new JobParameters(parameters));           
             BatchJobExecution bjex = SpringJobExecutionMapper.convert(jex);
             return new AsyncResult(ResponseEntity.ok(bjex));
-        } catch (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException | JobRestartException ex) {
+        } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
             return new AsyncResult(ResponseEntity.badRequest().body(ex));
         }
     }
     
     @RequestMapping(value="/stopJob", method = RequestMethod.GET)
-    public ResponseEntity stopJob(@RequestParam(required=true) Long instanceId) {
+    public ResponseEntity stopJob(@RequestParam(required=true) Long executionId) {
         try {
-            boolean result = jobOperator.stop(instanceId);
+            boolean result = jobOperator.stop(executionId);
             if (result) 
                 return ResponseEntity.ok("{\"success\" : \"Job forcefully stopped\"}");
             else 
@@ -91,9 +95,9 @@ public class JobLauncherController {
     }
     
     @RequestMapping(value="/restartJob", method = RequestMethod.GET)
-    public ResponseEntity restartJob(@RequestParam(required=true) Long instanceId) {
+    public ResponseEntity restartJob(@RequestParam(required=true) Long executionId) {
         try {
-            long result = jobOperator.restart(instanceId);
+            long result = jobOperator.restart(executionId);
             return ResponseEntity.ok("{\"success\" : \"Job successfully restarted with new id: " + result + "\"}");
             
                 //return ResponseEntity.ok("{\"failure\" : \"Failed to restart the job, it might not be restartable or cruched really badly\"}");            
@@ -103,6 +107,24 @@ public class JobLauncherController {
             return ResponseEntity.badRequest().body(ex);
         }
     }
+    
+//    @Bean
+//    public JobRepository jobRepository(final DataSource dataSource, final PlatformTransactionManager transactionManager) {
+//
+//        final JobRepositoryFactoryBean bean = new JobRepositoryFactoryBean();
+//        bean.setDatabaseType(databaseType);
+//        bean.setDataSource(dataSource);
+//        if (StringUtils.isNotBlank(schemaName)) {
+//            bean.setTablePrefix(schemaName);
+//        }
+//        bean.setTransactionManager(transactionManager);
+//        try {
+//            bean.afterPropertiesSet();
+//            return bean.getObject();
+//        } catch (final Exception e) {
+//            throw new BatchConfigurationException("Invalid batch job repository configuration.", e);
+//        }
+//    }    
     
 //    @RequestMapping(value = "/launchAsyncJob", method = RequestMethod.GET)
 //    @Async
